@@ -1,4 +1,4 @@
-**# 2D Adventure Game Project - Warrior's Solitude **
+# 2D Adventure Game Project - Warrior's Solitude
 
 This is a personal project of game development created for my learning of Unity through an online course.
 
