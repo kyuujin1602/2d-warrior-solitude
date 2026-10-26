@@ -9,6 +9,8 @@ public class UI : MonoBehaviour
     public UI_SkillTree skillTreeUI { get; private set; }
     public UI_Inventory inventoryUI { get; private set; }
 
+    public UI_Storage storageUI { get; private set; }
+
     private bool skillTreeEnabled;
     private bool inventoryEnabled;
 
@@ -20,9 +22,18 @@ public class UI : MonoBehaviour
 
         skillTreeUI = GetComponentInChildren<UI_SkillTree>(true);
         inventoryUI = GetComponentInChildren<UI_Inventory>(true);
+        storageUI = GetComponentInChildren<UI_Storage>(true);
 
         skillTreeEnabled = skillTreeUI.gameObject.activeSelf;
         inventoryEnabled = inventoryUI.gameObject.activeSelf;
+    }
+
+    public void SwitchOffAllTooltip()
+    {
+        itemToolTip.ShowToolTip(false, null);
+        skillToolTip.ShowToolTip(false, null);
+        statToolTip.ShowToolTip(false, null);
+
     }
 
     public void ToggleSkillTreeUI()

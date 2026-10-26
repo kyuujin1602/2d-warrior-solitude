@@ -95,6 +95,34 @@ public class Player : Entity
 
     public void TeleportPlayer(Vector3 position) => transform.position = position;
 
+    // Interact with the closest interactable object within a certain radius
+    private void TryInteract()
+    {
+        Transform closest = null;
+        float closestDistance = Mathf.Infinity;
+        Collider2D[] objectsAround = Physics2D.OverlapCircleAll(transform.position, 1.5f);
+
+        foreach (var target in objectsAround)
+        {
+            IInteractable interactable = target.GetComponent<IInteractable>();
+            if (interactable != null)
+            {
+                float distance = Vector2.Distance(transform.position, target.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closest = target.transform;
+                }
+            }
+        }
+        if (closest != null)
+        {
+            closest.GetComponent<IInteractable>().Interact();
+        }
+    }
+
+
+
     protected override IEnumerator SlowDownEntityCo(float duration, float slowMultiplier)
     {
         float originalMoveSpeed = moveSpeed;
@@ -166,6 +194,8 @@ public class Player : Entity
 
         input.Player.ToggleSkillTreeUI.performed += ctx => ui.ToggleSkillTreeUI();
         input.Player.ToggleInventoryUI.performed += ctx => ui.ToggleInventoryUI();
+
+        input.Player.Interact.performed += ctx => TryInteract(); // Press F
     }
 
     private void OnDisable()
