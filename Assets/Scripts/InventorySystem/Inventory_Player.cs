@@ -5,6 +5,8 @@ public class Inventory_Player : Inventory_Base
 {
     private Player player;
     public List<Inventory_EquipmentSlot> equipList;
+
+    public int gold = 10000;
     public Inventory_Storage storage { get; private set; }
 
     protected override void Awake()
@@ -16,7 +18,7 @@ public class Inventory_Player : Inventory_Base
 
     public void TryEquipItem(Inventory_Item item)
     {
-        var inventoryItem = FindItem(item.itemData);
+        var inventoryItem = FindItem(item);
         var matchingSlots = equipList.FindAll(slot => slot.slotType == item.itemData.itemType);
 
         // STEP 1 : Try to find empty slot and equip item

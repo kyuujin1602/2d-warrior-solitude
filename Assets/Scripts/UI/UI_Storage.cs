@@ -9,6 +9,11 @@ public class UI_Storage : MonoBehaviour
     private Inventory_Player inventory;
     private Inventory_Storage storage;
 
+    private void OnEnable()
+    {
+        UpdateUI();
+    }
+
     public void SetupStorage(Inventory_Player inventory, Inventory_Storage storage)
     {
         this.inventory = inventory;
@@ -23,6 +28,9 @@ public class UI_Storage : MonoBehaviour
     }
     private void UpdateUI()
     {
+        if (storage == null)
+            return;
+
         // Update the UI elements based on the current state of the storage and player inventory
         // This could involve refreshing item slots, updating counts, etc.
         inventorySlotParent.UpdateSlots(inventory.itemList);

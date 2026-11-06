@@ -27,6 +27,7 @@ public class Object_Crafter : Object_NPC, IInteractable
         base.OnTriggerExit2D(collision);
         ui.SwitchOffAllTooltip();
         ui.storageUI.gameObject.SetActive(false);
+        ui.craftUI.gameObject.SetActive(false);
     }
 
     public void Interact()
@@ -35,6 +36,8 @@ public class Object_Crafter : Object_NPC, IInteractable
         if (inventory == null || storage == null)
             return;
         ui.storageUI.SetupStorage(inventory, storage);
+        ui.craftUI.SetupCraftUI(storage);
         ui.storageUI.gameObject.SetActive(true);
+        // ui.craftUI.gameObject.SetActive(true);
     }
 }

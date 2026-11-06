@@ -1,10 +1,100 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Inventory_Storage : Inventory_Base
 {
-    private Inventory_Player inventory;
+    public Inventory_Player inventory;
     public List<Inventory_Item> materialStash;
+
+    public bool CanCraftItem(Inventory_Item itemToCraft)
+    {
+        return (HasEnoughMaterials(itemToCraft) && inventory.CanAddItem(itemToCraft));
+    }
+
+    public void CraftItem(Inventory_Item itemToCraft)
+    {
+        ConsumeMaterials(itemToCraft);
+        inventory.AddItem(itemToCraft);
+    }
+
+    public void ConsumeMaterials(Inventory_Item itemToCraft)
+    {
+        foreach (var requiredItem in itemToCraft.itemData.materials)
+        {
+            int amountToConsume = requiredItem.stackSize;
+            amountToConsume -= ConsumedMaterialsCount(inventory.itemList, requiredItem);
+
+            if (amountToConsume > 0)
+                amountToConsume -= ConsumedMaterialsCount(itemList, requiredItem);
+
+            if (amountToConsume > 0)
+                amountToConsume -= ConsumedMaterialsCount(materialStash, requiredItem);
+        }
+    }
+
+    private int ConsumedMaterialsCount(List<Inventory_Item> itemList, Inventory_Item neededItem)
+    {
+        int amountNeeded = neededItem.stackSize;
+        int consumedCount = 0;
+
+        foreach (var item in itemList)
+        {
+            if (item.itemData != neededItem.itemData)
+                continue;
+
+            int removeCount = Mathf.Min(item.stackSize, amountNeeded - consumedCount);
+
+            item.stackSize -= removeCount;
+            consumedCount += removeCount;
+
+            if (item.stackSize <= 0)
+            {
+                itemList.Remove(item);
+            }
+
+            if (consumedCount >= amountNeeded)
+                break;
+        }
+
+        return consumedCount;
+    }
+
+
+    public bool HasEnoughMaterials(Inventory_Item itemToCraft)
+    {
+        foreach (var requiredItem in itemToCraft.itemData.materials)
+        {
+            int availableAmount = GetAvailableAmount(requiredItem.itemData);
+            if (availableAmount < requiredItem.stackSize)
+                return false;
+        }
+        return true;
+    }
+
+    public int GetAvailableAmount(ItemDataSO itemToGet)
+    {
+        int amount = 0;
+        foreach (var item in inventory.itemList)
+        {
+            if (item.itemData == itemToGet)
+                amount += item.stackSize;
+        }
+
+        foreach (var item in itemList)
+        {
+            if (item.itemData == itemToGet)
+                amount += item.stackSize;
+        }
+
+        foreach(var item in materialStash)
+        {
+            if (item.itemData == itemToGet)
+                amount += item.stackSize;
+        }
+
+        return amount;
+    }
 
     public Inventory_Item StackableInStash(Inventory_Item itemToAdd)
     {
@@ -28,9 +118,11 @@ public class Inventory_Storage : Inventory_Base
         }
         else
         {
-            materialStash.Add(itemToAdd);
+            var newItem = new Inventory_Item(itemToAdd.itemData);
+            materialStash.Add(newItem);
         }
         TriggerUpdateUI();
+        materialStash = materialStash.OrderBy(item => item.itemData.itemName).ToList();
     }
 
     public void SetInventory(Inventory_Player inventory) => this.inventory = inventory; // Set the inventory reference whenever the storage is called
